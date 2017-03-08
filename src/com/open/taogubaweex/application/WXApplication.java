@@ -14,6 +14,7 @@ package com.open.taogubaweex.application;
 import android.app.Application;
 
 import com.open.taogubaweex.adapter.ImageAdapter;
+import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
@@ -38,6 +39,7 @@ public class WXApplication extends Application {
         WXSDKEngine.initialize(this,config);
         try {
 			WXSDKEngine.registerModule("weexModule", WeexModule.class);
+			WXSDKEngine.registerModule("weexModalUIModule", WeexModalUIModule.class);
 		} catch (WXException e) {
 			e.printStackTrace();
 		}

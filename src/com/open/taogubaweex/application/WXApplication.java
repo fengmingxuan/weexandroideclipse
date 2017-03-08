@@ -14,8 +14,10 @@ package com.open.taogubaweex.application;
 import android.app.Application;
 
 import com.open.taogubaweex.adapter.ImageAdapter;
+import com.open.taogubaweex.module.WeexModule;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.common.WXException;
 
 /**
  * 注意要在Manifest中启用
@@ -34,5 +36,10 @@ public class WXApplication extends Application {
         super.onCreate();
         InitConfig config=new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build();
         WXSDKEngine.initialize(this,config);
+        try {
+			WXSDKEngine.registerModule("weexModule", WeexModule.class);
+		} catch (WXException e) {
+			e.printStackTrace();
+		}
     }
 }

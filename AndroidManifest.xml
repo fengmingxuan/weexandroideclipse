@@ -37,6 +37,10 @@
                 <data android:scheme="wxpage"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainTabbarActivity"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>

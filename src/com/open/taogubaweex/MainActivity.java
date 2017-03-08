@@ -30,7 +30,7 @@ public class MainActivity extends  Activity implements IWXRenderListener {
          */
         mWXSDKInstance.renderByUrl("MyApplication",WeexUtils.HTTP+"://"+WeexUtils.IP+":"+WeexUtils.PORT+"/"+WeexUtils.MAIN_JS,null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
       
-//        mWXSDKInstance.renderByUrl("MyApplication","http://192.168.1.15:8080/dist/app.weex.js",null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
+//        mWXSDKInstance.renderByUrl("MyApplication","http://192.168.1.15:8080/dist/weexbar/tabbar.js",null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
 //        mWXSDKInstance.render("MyApplication", WXFileUtils.loadAsset("index.js", this), null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
     }
 

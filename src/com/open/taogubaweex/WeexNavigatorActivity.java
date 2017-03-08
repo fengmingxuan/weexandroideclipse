@@ -33,7 +33,7 @@ import com.taobao.weex.common.WXRenderStrategy;
  */
 public class WeexNavigatorActivity  extends  Activity implements IWXRenderListener {
 
-    WXSDKInstance mWXSDKInstance;
+	public WXSDKInstance mWXSDKInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

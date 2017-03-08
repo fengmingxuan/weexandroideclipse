@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.open.taogubaweex.utils.WeexUtils;
 import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRenderStrategy;
-import com.taobao.weex.utils.WXFileUtils;
 
 public class MainActivity extends  Activity implements IWXRenderListener {
 
@@ -28,7 +28,9 @@ public class MainActivity extends  Activity implements IWXRenderListener {
          * width 为-1 默认全屏，可以自己定制。
          * height =-1 默认全屏，可以自己定制。
          */
-        mWXSDKInstance.renderByUrl("MyApplication","http://192.168.1.15:8080/dist/app.weex.js",null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
+        mWXSDKInstance.renderByUrl("MyApplication",WeexUtils.HTTP+"://"+WeexUtils.IP+":"+WeexUtils.PORT+"/"+WeexUtils.MAIN_JS,null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
+      
+//        mWXSDKInstance.renderByUrl("MyApplication","http://192.168.1.15:8080/dist/app.weex.js",null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
 //        mWXSDKInstance.render("MyApplication", WXFileUtils.loadAsset("index.js", this), null, null, -1, -1, WXRenderStrategy.APPEND_ASYNC);
     }
 

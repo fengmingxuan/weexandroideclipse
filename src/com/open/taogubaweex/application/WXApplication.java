@@ -14,6 +14,7 @@ package com.open.taogubaweex.application;
 import android.app.Application;
 
 import com.open.taogubaweex.adapter.ImageAdapter;
+import com.open.taogubaweex.component.RichText;
 import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
 import com.taobao.weex.InitConfig;
@@ -40,6 +41,9 @@ public class WXApplication extends Application {
         try {
 			WXSDKEngine.registerModule("weexModule", WeexModule.class);
 			WXSDKEngine.registerModule("weexModalUIModule", WeexModalUIModule.class);
+			
+			
+			WXSDKEngine.registerComponent("richtext",RichText.class);
 		} catch (WXException e) {
 			e.printStackTrace();
 		}

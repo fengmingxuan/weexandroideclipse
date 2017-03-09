@@ -13,8 +13,11 @@ package com.open.taogubaweex.application;
 
 import android.app.Application;
 
+import com.avos.avoscloud.AVOSCloud;
 import com.open.taogubaweex.adapter.ImageAdapter;
+import com.open.taogubaweex.component.MyInput;
 import com.open.taogubaweex.component.RichText;
+import com.open.taogubaweex.module.WXEventModule;
 import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
 import com.taobao.weex.InitConfig;
@@ -36,13 +39,16 @@ public class WXApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        AVOSCloud.initialize(this,"zksrg6fpR18GjAsv0eHPs4Kz-gzGzoHsz","XfkYkvCvsJ1FkhEqzdTsMnNC");
+        
         InitConfig config=new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build();
         WXSDKEngine.initialize(this,config);
         try {
 			WXSDKEngine.registerModule("weexModule", WeexModule.class);
 			WXSDKEngine.registerModule("weexModalUIModule", WeexModalUIModule.class);
+			WXSDKEngine.registerModule("myModule", WXEventModule.class);
 			
-			
+			WXSDKEngine.registerComponent("myinput", MyInput.class);
 			WXSDKEngine.registerComponent("richtext",RichText.class);
 		} catch (WXException e) {
 			e.printStackTrace();

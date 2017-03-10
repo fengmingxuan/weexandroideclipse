@@ -2,5 +2,7 @@
 <resources>
 
     <string name="app_name">taogubaweex</string>
-
+ <color name="primary">#FF000000</color>
+    <color name="primary_dark">#FF000000</color>
+    <color name="status_bar_color">@color/primary_dark</color>
 </resources>

@@ -11,10 +11,10 @@
  */
 package com.open.taogubaweex;
 
+import android.os.Bundle;
+
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRenderStrategy;
-
-import android.os.Bundle;
 
 /**
  ***************************************************************************************************************************************************************************** 

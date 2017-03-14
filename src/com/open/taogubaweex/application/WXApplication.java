@@ -14,12 +14,15 @@ package com.open.taogubaweex.application;
 import android.app.Application;
 
 import com.avos.avoscloud.AVOSCloud;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.open.taogubaweex.adapter.ImageAdapter;
 import com.open.taogubaweex.component.MyInput;
 import com.open.taogubaweex.component.RichText;
 import com.open.taogubaweex.module.WXEventModule;
 import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
+import com.open.taogubaweex.utils.AppConfig;
+import com.open.taogubaweex.utils.ExtensionManager;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
@@ -53,5 +56,18 @@ public class WXApplication extends Application {
 		} catch (WXException e) {
 			e.printStackTrace();
 		}
+        
+        WXSDKEngine.addCustomOptions("appName", "WXSample");
+        WXSDKEngine.addCustomOptions("appGroup", "WXApp");
+//        WXSDKEngine.initialize(this,
+//            new InitConfig.Builder()
+//                .setImgAdapter(new ImageAdapter())
+//                .build()
+//        );
+
+        Fresco.initialize(this);
+        AppConfig.init(this);
+        ExtensionManager.registerComponents(AppConfig.getComponents());
+        ExtensionManager.registerModules(AppConfig.getModules());
     }
 }

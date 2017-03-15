@@ -16,6 +16,7 @@ import android.app.Application;
 import com.avos.avoscloud.AVOSCloud;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.open.taogubaweex.adapter.ImageAdapter;
+import com.open.taogubaweex.adapter.WXHttpAdapter;
 import com.open.taogubaweex.component.MyInput;
 import com.open.taogubaweex.component.RichText;
 import com.open.taogubaweex.module.WXEventModule;
@@ -25,6 +26,7 @@ import com.open.taogubaweex.utils.AppConfig;
 import com.open.taogubaweex.utils.ExtensionManager;
 import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.common.WXException;
 
 /**
@@ -44,7 +46,7 @@ public class WXApplication extends Application {
         super.onCreate();
         AVOSCloud.initialize(this,"zksrg6fpR18GjAsv0eHPs4Kz-gzGzoHsz","XfkYkvCvsJ1FkhEqzdTsMnNC");
         
-        InitConfig config=new InitConfig.Builder().setImgAdapter(new ImageAdapter()).build();
+        InitConfig config=new InitConfig.Builder().setHttpAdapter(new WXHttpAdapter()).setImgAdapter(new ImageAdapter()).build();
         WXSDKEngine.initialize(this,config);
         try {
 			WXSDKEngine.registerModule("weexModule", WeexModule.class);

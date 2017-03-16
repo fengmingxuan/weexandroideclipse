@@ -24,7 +24,9 @@ import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
 import com.open.taogubaweex.utils.AppConfig;
 import com.open.taogubaweex.utils.ExtensionManager;
+import com.open.taogubaweex.utils.WeexUtils;
 import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.adapter.IWXHttpAdapter;
 import com.taobao.weex.common.WXException;
@@ -45,6 +47,10 @@ public class WXApplication extends Application {
     public void onCreate() {
         super.onCreate();
         AVOSCloud.initialize(this,"zksrg6fpR18GjAsv0eHPs4Kz-gzGzoHsz","XfkYkvCvsJ1FkhEqzdTsMnNC");
+     // host 表示debug server的ip或域名
+        
+//        WXEnvironment.sRemoteDebugMode = true;
+//        WXEnvironment.sRemoteDebugProxyUrl = "ws://" + WeexUtils.IP + ":8088/debugProxy/native";
         
         InitConfig config=new InitConfig.Builder().setHttpAdapter(new WXHttpAdapter()).setImgAdapter(new ImageAdapter()).build();
         WXSDKEngine.initialize(this,config);

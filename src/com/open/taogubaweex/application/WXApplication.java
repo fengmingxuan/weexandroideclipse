@@ -51,8 +51,8 @@ public class WXApplication extends Application {
         AVOSCloud.initialize(this,"zksrg6fpR18GjAsv0eHPs4Kz-gzGzoHsz","XfkYkvCvsJ1FkhEqzdTsMnNC");
      // host 表示debug server的ip或域名
         
-        WXEnvironment.sRemoteDebugMode = true;
-        WXEnvironment.sRemoteDebugProxyUrl = "ws://" + WeexUtils.IP + ":8088/debugProxy/native";
+//        WXEnvironment.sRemoteDebugMode = true;
+//        WXEnvironment.sRemoteDebugProxyUrl = "ws://" + WeexUtils.IP + ":8088/debugProxy/native";
         
         InitConfig config=new InitConfig.Builder().setHttpAdapter(new WXHttpAdapter()).setImgAdapter(new ImageAdapter()).build();
         WXSDKEngine.initialize(this,config);
@@ -61,7 +61,7 @@ public class WXApplication extends Application {
 			WXSDKEngine.registerModule("weexModalUIModule", WeexModalUIModule.class);
 			WXSDKEngine.registerModule("myModule", WXEventModule.class);
 			 // 注册 webview module
-			WXSDKEngine.registerModule("webview", WXWebViewModule.class);
+//			WXSDKEngine.registerModule("webview", WXWebViewModule.class);
 	        // 注册 webview 组件
 //	        registerComponent("web", WXWeb.class);
 			
@@ -71,18 +71,18 @@ public class WXApplication extends Application {
 			e.printStackTrace();
 		}
         
-        WXSDKEngine.addCustomOptions("appName", "WXSample");
-        WXSDKEngine.addCustomOptions("appGroup", "WXApp");
+//        WXSDKEngine.addCustomOptions("appName", "WXSample");
+//        WXSDKEngine.addCustomOptions("appGroup", "WXApp");
 //        WXSDKEngine.initialize(this,
 //            new InitConfig.Builder()
 //                .setImgAdapter(new ImageAdapter())
 //                .build()
 //        );
 
-        Fresco.initialize(this);
-        AppConfig.init(this);
-        ExtensionManager.registerComponents(AppConfig.getComponents());
-        ExtensionManager.registerModules(AppConfig.getModules());
+//        Fresco.initialize(this);
+//        AppConfig.init(this);
+//        ExtensionManager.registerComponents(AppConfig.getComponents());
+//        ExtensionManager.registerModules(AppConfig.getModules());
         
     
     }

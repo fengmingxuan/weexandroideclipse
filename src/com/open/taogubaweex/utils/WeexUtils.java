@@ -30,5 +30,5 @@ public class WeexUtils {
 	/**端口*/
 	public static final String PORT = "8080";
 	/**桥接主入口*/
-	public static final String MAIN_JS = "dist/app.weex.js";
+	public static final String MAIN_JS = "dist/scroller-demo.js";//"dist/app.weex.js";
 }

@@ -11,13 +11,17 @@
  */
 package com.open.taogubaweex;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.http.SslError;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebSettings.LayoutAlgorithm;
@@ -41,7 +45,7 @@ import com.open.taogubaweex.utils.WeexUtils;
 public class WeexWebViewActivity extends  Activity {
 	public static final String TAG = WeexWebViewActivity.class.getSimpleName();
 	public WebView webview;
-	public String url = WeexUtils.HTTP+"://"+WeexUtils.IP+":"+WeexUtils.PORT;
+	public String url = WeexUtils.HTTP+"://"+WeexUtils.IP+WeexUtils.MAIN_JS;
 
 	/*
 	 * (non-Javadoc)
@@ -78,7 +82,7 @@ public class WeexWebViewActivity extends  Activity {
 	 * 
 	 * @see com.example.newsinfo.CommonActivity#initValue()
 	 */
-	protected void initValue() {
+	@SuppressLint("NewApi") protected void initValue() {
 		// TODO Auto-generated method stub
 		WebSettings webSettings = webview.getSettings();
 		webSettings.setJavaScriptEnabled(true);
@@ -89,6 +93,9 @@ public class WeexWebViewActivity extends  Activity {
 		webSettings.setBuiltInZoomControls(true);
 		// 扩大比例的缩放
 		webSettings.setUseWideViewPort(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {  
+			webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);  
+		}  
 		webSettings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
 		webSettings.setLoadWithOverviewMode(true);
 		if (getIntent().getStringExtra("URL") != null) {
@@ -135,6 +142,12 @@ public class WeexWebViewActivity extends  Activity {
 			// TODO Auto-generated method stub
 			super.doUpdateVisitedHistory(view, url, isReload);
 		}
+		
+		@Override  
+        public void onReceivedSslError(WebView view,  
+                SslErrorHandler handler, SslError error) {  
+            handler.proceed();  
+        } 
 	}
 
 	public WebChromeClientBase mWebChromeClientBase = new WebChromeClientBase();

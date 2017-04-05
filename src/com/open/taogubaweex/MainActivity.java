@@ -3,8 +3,8 @@ package com.open.taogubaweex;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 
@@ -13,7 +13,7 @@ import com.taobao.weex.IWXRenderListener;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXRenderStrategy;
 
-public class MainActivity extends  Activity implements IWXRenderListener {
+public class MainActivity extends  FragmentActivity implements IWXRenderListener {
 
     WXSDKInstance mWXSDKInstance;
 	Map<String, Object> options = new HashMap<String, Object>();

@@ -24,9 +24,9 @@ package com.open.taogubaweex.utils;
  */
 public class WeexUtils {
 	/**网络请求方式http or https*/
-	public static final String HTTP = "https";//https://js.taoguba.com.cn/weex/zhuanti/index.html?skinType=1
+	public static final String HTTP = "http";//https://js.taoguba.com.cn/weex/zhuanti/index.html?skinType=1
 	/**ip*/
-	public static final String IP = "js.taoguba.com.cn";
+	public static final String IP = "192.168.1.15:8080";
 	/**桥接主入口*/
-	public static final String MAIN_JS = "/weex/zhuanti/index.html?skinType=0";//"dist/app.weex.js";
+	public static final String MAIN_JS = "/dist/app.weex.js";//"dist/app.weex.js";
 }

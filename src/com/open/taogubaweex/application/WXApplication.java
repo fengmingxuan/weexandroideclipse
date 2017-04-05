@@ -14,23 +14,16 @@ package com.open.taogubaweex.application;
 import android.app.Application;
 
 import com.avos.avoscloud.AVOSCloud;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.open.taogubaweex.adapter.ImageAdapter;
 import com.open.taogubaweex.adapter.WXHttpAdapter;
 import com.open.taogubaweex.component.MyInput;
 import com.open.taogubaweex.component.RichText;
+import com.open.taogubaweex.module.WXActionSheetModule;
 import com.open.taogubaweex.module.WXEventModule;
-import com.open.taogubaweex.module.WXWebViewModule;
 import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
-import com.open.taogubaweex.utils.AppConfig;
-import com.open.taogubaweex.utils.ExtensionManager;
-import com.open.taogubaweex.utils.WeexUtils;
 import com.taobao.weex.InitConfig;
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.adapter.IWXHttpAdapter;
-import com.taobao.weex.bridge.WXModuleManager;
 import com.taobao.weex.common.WXException;
 
 /**
@@ -60,6 +53,7 @@ public class WXApplication extends Application {
 			WXSDKEngine.registerModule("weexModule", WeexModule.class);
 			WXSDKEngine.registerModule("weexModalUIModule", WeexModalUIModule.class);
 			WXSDKEngine.registerModule("myModule", WXEventModule.class);
+			WXSDKEngine.registerModule("actionSheet", WXActionSheetModule.class);
 			 // 注册 webview module
 //			WXSDKEngine.registerModule("webview", WXWebViewModule.class);
 	        // 注册 webview 组件

@@ -11,9 +11,9 @@
  */
 package com.open.taogubaweex;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
 import com.taobao.weex.IWXRenderListener;
@@ -31,7 +31,7 @@ import com.taobao.weex.common.WXRenderStrategy;
  * @description:
  *****************************************************************************************************************************************************************************
  */
-public class WeexNavigatorActivity  extends  Activity implements IWXRenderListener {
+public class WeexNavigatorActivity  extends  FragmentActivity implements IWXRenderListener {
 
 	public WXSDKInstance mWXSDKInstance;
 

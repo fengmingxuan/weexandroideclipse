@@ -18,8 +18,10 @@ import com.open.taogubaweex.adapter.ImageAdapter;
 import com.open.taogubaweex.adapter.WXHttpAdapter;
 import com.open.taogubaweex.component.MyInput;
 import com.open.taogubaweex.component.RichText;
+import com.open.taogubaweex.component.WeeXWeb;
 import com.open.taogubaweex.module.WXActionSheetModule;
 import com.open.taogubaweex.module.WXEventModule;
+import com.open.taogubaweex.module.WeeXWebViewModule;
 import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
 import com.taobao.weex.InitConfig;
@@ -55,9 +57,9 @@ public class WXApplication extends Application {
 			WXSDKEngine.registerModule("myModule", WXEventModule.class);
 			WXSDKEngine.registerModule("actionSheet", WXActionSheetModule.class);
 			 // 注册 webview module
-//			WXSDKEngine.registerModule("webview", WXWebViewModule.class);
+			WXSDKEngine.registerModule("webview", WeeXWebViewModule.class);
 	        // 注册 webview 组件
-//	        registerComponent("web", WXWeb.class);
+			WXSDKEngine.registerComponent("web", WeeXWeb.class);
 			
 			WXSDKEngine.registerComponent("myinput", MyInput.class);
 			WXSDKEngine.registerComponent("richtext",RichText.class);

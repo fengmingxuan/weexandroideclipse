@@ -28,5 +28,6 @@ public class WeexUtils {
 	/**ip*/
 	public static final String IP = "192.168.1.15:8080";
 	/**桥接主入口*/
-	public static final String MAIN_JS = "/dist/app.weex.js";//"dist/app.weex.js";
+	public static final String MAIN_JS = "/storm/build/src/mainlist.js";//"dist/app.weex.js";
+	public static final String MAIN_WEB = "/index.html?page=./storm/build/src/mainlist.js"; 
 }

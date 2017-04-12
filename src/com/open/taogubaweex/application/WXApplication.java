@@ -57,7 +57,7 @@ public class WXApplication extends Application {
 			WXSDKEngine.registerModule("myModule", WXEventModule.class);
 			WXSDKEngine.registerModule("actionSheet", WXActionSheetModule.class);
 			 // 注册 webview module
-			WXSDKEngine.registerModule("webview", WeeXWebViewModule.class);
+			WXSDKEngine.registerModule("mywebview", WeeXWebViewModule.class);
 	        // 注册 webview 组件
 			WXSDKEngine.registerComponent("web", WeeXWeb.class);
 			

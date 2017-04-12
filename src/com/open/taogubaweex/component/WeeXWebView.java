@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.net.http.SslError;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.webkit.SslErrorHandler;
@@ -23,10 +24,11 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import com.open.taogubaweex.js.InAndroidScript;
 import com.taobao.weex.ui.view.IWebView;
 import com.taobao.weex.utils.WXLogUtils;
 
-@SuppressLint("NewApi") public class WeeXWebView implements IWebView {
+@SuppressLint("NewApi") public class WeeXWebView implements IWeexWebView {
 
     private Context mContext;
     private WebView mWebView;
@@ -102,7 +104,18 @@ import com.taobao.weex.utils.WXLogUtils;
             return;
         getWebView().goForward();
     }
-
+	/* (non-Javadoc)
+	 * @see com.open.taogubaweex.component.IWeexWebView#callnativeh5(java.lang.String)
+	 */
+	@Override
+	public void callnativeh5(String ref,String json) {
+		// TODO Auto-generated method stub
+		 if(getWebView() == null)
+	            return;
+		    Log.d("WeeXWebView", "callnativeh5=="+ref+";json=="+json);
+		    getWebView().loadUrl("javascript:callnativeh5('IWeexWebView')");
+//	        ((IWeexWebView) getWebView()).callnativeh5(ref);
+	}
     /*@Override
     public void setVisibility(int visibility) {
         if (mRootView != null) {
@@ -140,7 +153,7 @@ import com.taobao.weex.utils.WXLogUtils;
         return mWebView;
     }
 
-    @TargetApi(23) private void initWebView(WebView wv) {
+    @SuppressLint("JavascriptInterface") @TargetApi(23) private void initWebView(WebView wv) {
         WebSettings settings = wv.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setAppCacheEnabled(true);
@@ -148,6 +161,7 @@ import com.taobao.weex.utils.WXLogUtils;
         settings.setDomStorageEnabled(true);
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
+        wv.addJavascriptInterface(new InAndroidScript(mContext), "nativeInterface");
         wv.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -220,5 +234,7 @@ import com.taobao.weex.utils.WXLogUtils;
 
         });
     }
+
+
 
 }

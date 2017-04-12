@@ -16,8 +16,6 @@ import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.view.IWebView;
-import com.taobao.weex.ui.view.WXWebView;
 import com.taobao.weex.utils.WXUtils;
 
 import java.util.HashMap;
@@ -29,7 +27,8 @@ public class WeeXWeb extends WXComponent {
     public static final String GO_BACK = "goBack";
     public static final String GO_FORWARD = "goForward";
     public static final String RELOAD = "reload";
-    protected IWebView mWebView;
+    public static final String CALL_NATIVE_H5 = "callnativeh5";
+    protected IWeexWebView mWebView;
 
     @Deprecated
     public WeeXWeb(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
@@ -42,18 +41,18 @@ public class WeeXWeb extends WXComponent {
     }
 
     protected void  createWebView(){
-        mWebView = new WXWebView(getContext());
+        mWebView = new WeeXWebView(getContext());
     }
 
     @Override
     protected View initComponentHostView(@NonNull Context context) {
-        mWebView.setOnErrorListener(new IWebView.OnErrorListener() {
+        mWebView.setOnErrorListener(new IWeexWebView.OnErrorListener() {
             @Override
             public void onError(String type, Object message) {
                 fireEvent(type, message);
             }
         });
-        mWebView.setOnPageListener(new IWebView.OnPageListener() {
+        mWebView.setOnPageListener(new IWeexWebView.OnPageListener() {
             @Override
             public void onReceivedTitle(String title) {
                 if (getDomObject().getEvents().contains(Constants.Event.RECEIVEDTITLE)) {
@@ -124,7 +123,7 @@ public class WeeXWeb extends WXComponent {
         }
     }
 
-    public void setAction(String action) {
+    public void setAction(String action,String ref,String json) {
         if (!TextUtils.isEmpty(action)) {
             if (action.equals(GO_BACK)) {
                 goBack();
@@ -132,6 +131,8 @@ public class WeeXWeb extends WXComponent {
                 goForward();
             } else if (action.equals(RELOAD)) {
                 reload();
+            } else if (action.equals(CALL_NATIVE_H5)) {
+            	callnativeh5(ref,json);
             }
         }
     }
@@ -152,6 +153,10 @@ public class WeeXWeb extends WXComponent {
     private void reload() {
         getWebView().reload();
     }
+    
+    private void callnativeh5(String ref,String json) {
+        getWebView().callnativeh5(ref,json);
+    }
 
     private void goForward() {
         getWebView().goForward();
@@ -161,7 +166,7 @@ public class WeeXWeb extends WXComponent {
         getWebView().goBack();
     }
 
-    private IWebView getWebView() {
+    private IWeexWebView getWebView() {
         return mWebView;
     }
 

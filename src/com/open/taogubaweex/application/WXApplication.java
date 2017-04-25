@@ -14,23 +14,25 @@ package com.open.taogubaweex.application;
 import android.app.Application;
 
 import com.avos.avoscloud.AVOSCloud;
+import com.open.taogubaweex.adapter.DefaultWebSocketAdapterFactory;
 import com.open.taogubaweex.adapter.ImageAdapter;
 import com.open.taogubaweex.adapter.WXHttpAdapter;
 import com.open.taogubaweex.component.MyInput;
 import com.open.taogubaweex.component.RichText;
-import com.open.taogubaweex.component.WeeXText;
 import com.open.taogubaweex.component.WeeXWeb;
 import com.open.taogubaweex.module.WXActionSheetModule;
 import com.open.taogubaweex.module.WXEventModule;
 import com.open.taogubaweex.module.WeeXWebViewModule;
 import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
+import com.open.taogubaweex.utils.WeexUtils;
+import com.open.taogubaweex.view.WeeXSlider;
 import com.taobao.weex.InitConfig;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
-import com.taobao.weex.dom.WXTextDomObject;
 import com.taobao.weex.ui.SimpleComponentHolder;
-import com.taobao.weex.ui.component.WXBasicComponentType;
+import com.taobao.weex.ui.component.WXSlider;
 
 /**
  * 注意要在Manifest中启用
@@ -51,9 +53,9 @@ public class WXApplication extends Application {
      // host 表示debug server的ip或域名
         
 //        WXEnvironment.sRemoteDebugMode = true;
-//        WXEnvironment.sRemoteDebugProxyUrl = "ws://" + WeexUtils.IP + ":8088/debugProxy/native";
+//        WXEnvironment.sRemoteDebugProxyUrl = "ws://192.168.1.15" + ":8088/debugProxy/native";
         
-        InitConfig config=new InitConfig.Builder().setHttpAdapter(new WXHttpAdapter()).setImgAdapter(new ImageAdapter()).build();
+        InitConfig config=new InitConfig.Builder().setHttpAdapter(new WXHttpAdapter()).setImgAdapter(new ImageAdapter()).setWebSocketAdapterFactory(new DefaultWebSocketAdapterFactory()).build();
         WXSDKEngine.initialize(this,config);
         try {
 			WXSDKEngine.registerModule("weexModule", WeexModule.class);
@@ -67,7 +69,14 @@ public class WXApplication extends Application {
 			
 			WXSDKEngine.registerComponent("myinput", MyInput.class);
 			WXSDKEngine.registerComponent("myrichtext",RichText.class);
-			
+			WXSDKEngine.registerComponent(
+				        new SimpleComponentHolder(
+				          WeeXSlider.class,
+				          new WeeXSlider.Creator()
+				        ),
+				        true,
+				       "mypager"
+				      );
 //			WXSDKEngine.registerComponent(
 //				        new SimpleComponentHolder(
 //				        		WeeXText.class,

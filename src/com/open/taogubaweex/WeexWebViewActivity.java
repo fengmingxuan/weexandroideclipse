@@ -51,7 +51,7 @@ import com.open.taogubaweex.utils.WeexUtils;
 public class WeexWebViewActivity extends  Activity {
 	public static final String TAG = WeexWebViewActivity.class.getSimpleName();
 	public WebView webview;
-	public String url = WeexUtils.HTTP+"://"+WeexUtils.IP+WeexUtils.MAIN_WEB;
+	public String url =  WeexUtils.HTTP+"://"+WeexUtils.IP+WeexUtils.MAIN_WEB;
 	private static final String APP_CACAHE_DIRNAME = "/webcache";  
 	/*
 	 * (non-Javadoc)

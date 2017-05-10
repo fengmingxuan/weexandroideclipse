@@ -19,20 +19,19 @@ import com.open.taogubaweex.adapter.ImageAdapter;
 import com.open.taogubaweex.adapter.WXHttpAdapter;
 import com.open.taogubaweex.component.MyInput;
 import com.open.taogubaweex.component.RichText;
+import com.open.taogubaweex.component.WeeXText;
+import com.open.taogubaweex.component.WeeXTextDomObject;
 import com.open.taogubaweex.component.WeeXWeb;
 import com.open.taogubaweex.module.WXActionSheetModule;
 import com.open.taogubaweex.module.WXEventModule;
 import com.open.taogubaweex.module.WeeXWebViewModule;
 import com.open.taogubaweex.module.WeexModalUIModule;
 import com.open.taogubaweex.module.WeexModule;
-import com.open.taogubaweex.utils.WeexUtils;
 import com.open.taogubaweex.view.WeeXSlider;
 import com.taobao.weex.InitConfig;
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
 import com.taobao.weex.ui.SimpleComponentHolder;
-import com.taobao.weex.ui.component.WXSlider;
 
 /**
  * 注意要在Manifest中启用
@@ -77,15 +76,15 @@ public class WXApplication extends Application {
 				        true,
 				       "mypager"
 				      );
-//			WXSDKEngine.registerComponent(
-//				        new SimpleComponentHolder(
-//				        		WeeXText.class,
-//				          new WeeXText.Creator()
-//				        ),
-//				        false,
-//				       "myrichtext"
-//				      );
-//			WXSDKEngine.registerDomObject("WXSDKEngine.", WXTextDomObject.class);
+			WXSDKEngine.registerComponent(
+			        new SimpleComponentHolder(
+			        		WeeXText.class,
+			                new WeeXText.Creator()
+			              ),
+			              false,
+			              "mystockview"
+			            );
+			WXSDKEngine.registerDomObject("mystockview", WeeXTextDomObject.class);
 		} catch (WXException e) {
 			e.printStackTrace();
 		}

@@ -210,7 +210,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.text.Layout;
 import android.view.MotionEvent;
-import android.view.View;
+import android.widget.TextView;
 
 import com.taobao.weex.ui.view.IRenderStatus;
 import com.taobao.weex.ui.view.gesture.WXGesture;
@@ -219,66 +219,73 @@ import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 /**
  * TextView wrapper
  */
-public class WeeXTextView extends View implements WXGestureObservable, IWeeXTextView,
-                                                IRenderStatus<WeeXText> {
+public class WeeXTextView extends TextView implements WXGestureObservable, IWeeXTextView, IRenderStatus<WeeXText> {
 
-  private WeakReference<WeeXText> mWeakReference;
-  private WXGesture wxGesture;
-  private Layout textLayout;
-  public WeeXTextView(Context context) {
-    super(context);
-  }
+	private WeakReference<WeeXText> mWeakReference;
+	private WXGesture wxGesture;
+	private Layout textLayout;
 
-  @Override
-  protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-    canvas.save();
-    Layout layout= getTextLayout();
-    if(layout!=null){
-      canvas.translate(getPaddingLeft(),getPaddingTop());
-      layout.draw(canvas);
-    }
-    canvas.restore();
-  }
+	public WeeXTextView(Context context) {
+		super(context);
+	}
 
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    boolean result = super.onTouchEvent(event);
-    if (wxGesture != null) {
-      result |= wxGesture.onTouch(this, event);
-    }
-    return result;
-  }
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+		canvas.save();
+		Layout layout = getTextLayout();
+		if (layout != null) {
+			canvas.translate(getPaddingLeft(), getPaddingTop());
+			// texview重在layout上面。layout算宽高
+			// layout.draw(canvas);
+		}
+		canvas.restore();
+	}
 
-  @Override
-  public void registerGestureListener(WXGesture wxGesture) {
-    this.wxGesture = wxGesture;
-  }
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_MOVE
+				||event.getAction() == MotionEvent.ACTION_SCROLL
+				||event.getAction() == MotionEvent.ACTION_HOVER_MOVE
+				) {
+			return true;
+		}
+		boolean result = super.onTouchEvent(event);
+		// if (wxGesture != null) {
+		// result |= wxGesture.onTouch(this, event);
+		// }
+		return result;
+	}
 
-  @Override
-  public CharSequence getText() {
-    return textLayout.getText();
-  }
+	@Override
+	public void registerGestureListener(WXGesture wxGesture) {
+		// this.wxGesture = wxGesture;
+	}
 
-  public Layout getTextLayout() {
-    return textLayout;
-  }
+	@Override
+	public CharSequence getText() {
+		return textLayout.getText();
+	}
 
-  public void setTextLayout(Layout layout) {
-    this.textLayout = layout;
-    if(layout!=null){
-      setContentDescription(layout.getText());
-    }
-    if (mWeakReference != null) {
-      WeeXText wxText = mWeakReference.get();
-      if (wxText != null) {
-        wxText.readyToRender();
-      }
-    }
-  }
+	public Layout getTextLayout() {
+		return textLayout;
+	}
 
-  @Override
-  public void holdComponent(WeeXText component) {
-    mWeakReference = new WeakReference<>(component);
-  }
+	public void setTextLayout(Layout layout) {
+		this.textLayout = layout;
+		if (layout != null) {
+			setContentDescription(layout.getText());
+		}
+		if (mWeakReference != null) {
+			WeeXText wxText = mWeakReference.get();
+			if (wxText != null) {
+				wxText.readyToRender();
+			}
+		}
+	}
+
+	@Override
+	public void holdComponent(WeeXText component) {
+		mWeakReference = new WeakReference<>(component);
+	}
 }

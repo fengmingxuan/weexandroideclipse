@@ -205,18 +205,42 @@
 package com.open.taogubaweex.component;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.TextUtils.TruncateAt;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONArray;
+import com.google.gson.Gson;
+import com.open.taogubaweex.bean.MyRich;
+import com.open.taogubaweex.bean.MyRichJson;
+import com.open.taogubaweex.utils.CustomLinkMovementMethod;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.annotation.Component;
 import com.taobao.weex.common.Constants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.ComponentCreator;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
 import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVContainer;
 
@@ -287,13 +311,193 @@ public class WeeXText extends WXComponent<WeeXTextView> {
       case Constants.Name.TEXT_OVERFLOW:
       case Constants.Name.LINE_HEIGHT:
     	  return true;
-      case Constants.Name.VALUE:
-        return true;
       default:
         return super.setProperty(key, param);
     }
   }
-
+  
+  public static void onClick(View widget, String instanceId, List<Object> params,String moduleName,String methodName) {
+	    JSONArray array = new JSONArray();
+	    for(Object obj:params){
+	    	array.add(obj);
+	    }
+	    WXSDKManager.getInstance().getWXBridgeManager().
+	        callModuleMethod(instanceId, moduleName, methodName, array);
+ }
+  
+  @WXComponentProp(name = "value")
+  public void setText(String value){
+    Log.i("RichText", "value=="+value);
+    
+    try {
+    	  Gson gson = new Gson();
+    	  final MyRichJson mMyRichJson = gson.fromJson(value, MyRichJson.class);
+    	    if(mMyRichJson!=null && mMyRichJson.getMyrichvalue()!=null&& mMyRichJson.getMyrichvalue().size()>0){
+    	    	try {
+    	    		if(mMyRichJson.getTagTextColor()==null ||  mMyRichJson.getTagTextColor().length()==0 ||
+    	    				!mMyRichJson.getTagTextColor().contains("#")){
+    	    			mMyRichJson.setTagTextColor("#1191f6");
+    	    		}
+    	    		CustomLinkMovementMethod mCustomLinkMovementMethod = (CustomLinkMovementMethod) CustomLinkMovementMethod.getInstance();
+    				mCustomLinkMovementMethod.setOnTextClickListener(new CustomLinkMovementMethod.TextClickedListener() {
+    					@Override
+    					public void onTextClicked() {
+    						Log.e("CustomLinkMovementMethod", "onTextClicked");
+    						if(mMyRichJson.getParams()!=null && mMyRichJson.getModuleName()!=null && mMyRichJson.getMethodName()!=null){
+    							onClick(null, getInstanceId(), mMyRichJson.getParams(),mMyRichJson.getModuleName(),mMyRichJson.getMethodName());
+    						}
+    					}
+    				});
+    				((TextView)getRealView()).setMovementMethod(mCustomLinkMovementMethod);
+    				
+    				SpannableString spannable = new SpannableString(mMyRichJson.getContent().replace("[tag]", "").replace("[/tag]", "")
+    						.replace("[theme]", "").replace("[/theme]", ""));
+    				int start = 0;
+    				int end = 0;
+    				int preend = 0;
+    				final String tagreplace ="[tag][/tag]";
+    				final String themereplace ="[theme][/theme]";
+    				String tag = "\\[tag\\](.*?)\\[\\/tag\\]|\\[theme\\](.*?)\\[\\/theme\\]";
+        	    	for(int i=0;i<mMyRichJson.getMyrichvalue().size();i++){
+        	    		MyRich myRichbean = mMyRichJson.getMyrichvalue().get(i);
+        	    		Matcher matcher = Pattern.compile(tag).matcher(myRichbean.getStrText());
+        	    		Log.i("RichText", "i=="+i+";"+myRichbean.getStrText());
+        	    		
+        	    		int find = 0;
+    					int tagfind = 0;
+    					int themefind = 0;
+    					while (matcher.find()) {
+    						int pstart = 0;
+    						int pend = 0;
+    						 
+							final String tagContent = matcher.group().toString();
+							pstart = matcher.start();
+							pend = matcher.end();
+    						
+    						if (find == 0) {
+    							preend += end;
+    							if (i == 0) {
+    								start = 0;
+    							} else {
+    								start = end;
+    							}
+    						} else{
+    							start = end;
+    						}
+    						end = preend + pstart-tagfind*tagreplace.length()-themefind*themereplace.length();
+    						spannable.setSpan(new ForegroundColorSpan(Color.parseColor(myRichbean.getStrTextColor())), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    						spannable.setSpan(new AbsoluteSizeSpan(myRichbean.getStrTextSize(),true ), start, end,
+    								Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    						if(tagContent.contains("[tag]")){
+    							tagfind ++;
+    						}
+    						
+    						if(tagContent.contains("[theme]")){
+    							themefind++;
+    						}
+    						find++;
+    						// 正则start --- end
+    						start = end;
+    						end = preend + pend -tagfind*tagreplace.length()-themefind*themereplace.length();
+    						spannable.setSpan(new ForegroundColorSpan(Color.parseColor(mMyRichJson.getTagTextColor())), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    						spannable.setSpan(new AbsoluteSizeSpan(myRichbean.getStrTextSize(),true ), start, end,
+    								Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    						ClickableSpan click_span = new ClickableSpan() {
+    	    					@Override
+    	    					public void onClick(View widget) {
+    	    						Log.e("ClickableSpan", "onClick");
+    	    						if(tagContent.contains("[tag]")){
+    	    							 List<Object> params = new  ArrayList<Object>();
+    	    							 params.add(tagContent.replace("[tag]", "").replace("[/tag]", ""));
+    	    							 WeeXText.onClick(null, getInstanceId(), params, "weexEventModule", "searchStock");
+//    	    							Toast.makeText(getContext(), tagContent, Toast.LENGTH_SHORT).show();
+    	     						}
+    	     						
+    	     						if(tagContent.contains("[theme]")){
+    	     							List<Object> params = new  ArrayList<Object>();
+    	     							params.add(tagContent.replace("[theme]", "").replace("[/theme]", ""));
+    	     							WeeXText.onClick(null, getInstanceId(), params, "weexEventModule", "searchTheme");
+//    	     							Toast.makeText(getContext(), tagContent, Toast.LENGTH_SHORT).show();
+    	     						}
+    	     						return;
+    	    					}
+    	    					@Override
+    	    					public void updateDrawState(TextPaint ds) {
+    	    						super.updateDrawState(ds);
+    	    						// 设置没有下划线
+    	    						ds.setUnderlineText(false);
+    	    					}
+    	    				};
+    	    				spannable.setSpan(click_span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    					}
+        	    		
+    					if(find>0){
+    						// 剩余长度
+    						start = end;
+    						end = preend + myRichbean.getStrText().length() -tagfind*tagreplace.length()-themefind*themereplace.length();
+    						spannable.setSpan(new ForegroundColorSpan(Color.parseColor(myRichbean.getStrTextColor())), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    						spannable.setSpan(new AbsoluteSizeSpan(myRichbean.getStrTextSize(),true ),start, end,
+    								Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    					}
+    					
+    					// 没有正则
+    					if (find == 0) {
+    						if (i == 0) {
+    							start = 0;
+    							end = myRichbean.getStrText().length();
+    						} else {
+    							start = end;
+    							end = end + myRichbean.getStrText().length();
+    						}
+    						spannable.setSpan(new ForegroundColorSpan(Color.parseColor(myRichbean.getStrTextColor())), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    						spannable.setSpan(new AbsoluteSizeSpan(myRichbean.getStrTextSize(),true ), start, end,
+    								Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    					}
+        	    	}
+        	    	((TextView)getRealView()).setText(spannable);
+        	    	((TextView)getRealView()).setLineSpacing(10f, 1);
+        	    	((TextView)getRealView()).setLinkTextColor(Color.parseColor(mMyRichJson.getTagTextColor()));
+//    				((TextView)getRealView()).setTextColor(getContext().getResources().getIntArray(R.array.txt_day_black_night_greywhite_color)[getSkinType()]);
+    				((TextView)getRealView()).setFocusable(false);
+    				((TextView)getRealView()).setLongClickable(false);
+    				if(mMyRichJson.getGravity()!=null && mMyRichJson.getGravity().length()>0){
+    					 if("center".equals(mMyRichJson.getGravity())){
+    						 ((TextView)getRealView()).setGravity(Gravity.CENTER);
+    					 }else  if("left".equals(mMyRichJson.getGravity())){
+    						 ((TextView)getRealView()).setGravity(Gravity.LEFT);
+    					 }else  if("right".equals(mMyRichJson.getGravity())){
+    						 ((TextView)getRealView()).setGravity(Gravity.RIGHT);
+    					 }
+    				}else{
+    					((TextView)getRealView()).setGravity(Gravity.LEFT);
+    				}
+    				if(mMyRichJson.getLines()!=0){
+    					((TextView)getRealView()).setMaxLines(mMyRichJson.getLines());
+    					((TextView)getRealView()).setEllipsize(TruncateAt.END);
+    				}
+				} catch (Exception e) {
+					// TODO: handle exception
+					((TextView)getRealView()).setText(mMyRichJson.getContent());
+					((TextView)getRealView()).setLineSpacing(10f, 1);
+					if(mMyRichJson.getLines()!=0){
+    					((TextView)getRealView()).setMaxLines(mMyRichJson.getLines());
+    					((TextView)getRealView()).setEllipsize(TruncateAt.END);
+    				}
+				}
+    	    	
+    	    }else{
+    	    	((TextView)getRealView()).setText(value);
+    	    	((TextView)getRealView()).setLineSpacing(10f, 1);
+    	    }
+    	   
+	} catch (Exception e) {
+		((TextView)getRealView()).setText(value);
+		((TextView)getRealView()).setLineSpacing(10f, 1);
+	}
+    
+//    ((TextView)getRealView()).setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+  }
+   
   /**
    * Flush view no matter what height and width the {@link WXDomObject} specifies.
    * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
@@ -326,165 +530,5 @@ public class WeeXText extends WXComponent<WeeXTextView> {
     }
     return super.convertEmptyProperty(propName, originalValue);
   }
-//	/**
-//{
-//  "content":"1490952336000婷婷春蕾天啊123收快递费的撒娇",
-//  "gravity":"center",
-//  "myrichvalue":[
-//      {
-//          "onClickType":0,
-//          "strText":"天啊123收快递费的撒娇",
-//          "strTextColor":"#000000",
-//          "strTextSize":22
-//      },
-//      {
-//          "onClickType":0,
-//          "strText":"天啊123收快递费的撒娇",
-//          "strTextColor":"#000000",
-//          "strTextSize":22
-//      },
-//      {
-//          "onClickType":0,
-//          "strText":"天啊123收快递费的撒娇",
-//          "strTextColor":"#000000",
-//          "strTextSize":22
-//      }
-//  ]
-//}
-//	 */
-//@WXComponentProp(name = "value")
-//public void setText(String value){
-//  Log.i("RichText", "value=="+value);
-//  
-//  try {
-//  	  Gson gson = new Gson();
-//  	  MyRichJson mMyRichJson = gson.fromJson(value, MyRichJson.class);
-//  	    if(mMyRichJson!=null && mMyRichJson.getMyrichvalue()!=null&& mMyRichJson.getMyrichvalue().size()>0){
-//  	    	CustomLinkMovementMethod mCustomLinkMovementMethod = (CustomLinkMovementMethod) CustomLinkMovementMethod.getInstance();
-//				mCustomLinkMovementMethod.setOnTextClickListener(new CustomLinkMovementMethod.TextClickedListener() {
-//					@Override
-//					public void onTextClicked() {
-//					}
-//				});
-////				((TextView)getRealView()).setMovementMethod(mCustomLinkMovementMethod);
-//				
-//				SpannableString builder = new SpannableString(mMyRichJson.getContent());
-//				int start = 0;
-//	    		int end = 0;
-//  	    	for(int i=0;i<mMyRichJson.getMyrichvalue().size();i++){
-//  	    		MyRich myRichbean = mMyRichJson.getMyrichvalue().get(i);
-//  				
-////  				ClickableSpan click_span = new ClickableSpan() {
-////  					@Override
-////  					public void onClick(View widget) {
-////  						 
-////  					}
-////  					@Override
-////  					public void updateDrawState(TextPaint ds) {
-////  						super.updateDrawState(ds);
-////  						// 设置没有下划线
-////  						ds.setUnderlineText(false);
-////  					}
-////  				};
-////  				builder.setSpan(click_span, 0, callbean.getUserName().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//  	    		Log.i("RichText", "i=="+i+";"+myRichbean.getStrText());
-//  	    		if(i==0){
-//  	    			start = 0;
-//  	    			end = myRichbean.getStrText().length();
-//  	    		}else{
-//  	    			start = end;
-//  	    			end = end + myRichbean.getStrText().length();
-//  	    		}
-//  	    		
-//  	    		builder.setSpan(new ForegroundColorSpan(Color.parseColor(myRichbean.getStrTextColor())), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//  	    		builder.setSpan(new AbsoluteSizeSpan(myRichbean.getStrTextSize(), true), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//  	    	
-//  	    	}
-//  	    	((WeeXTextView) getHostView()).getTextLayout();
-////				((TextView)getRealView()).setFocusable(false);
-////				((TextView)getRealView()).setLongClickable(false);
-////				if(mMyRichJson.getGravity()!=null && mMyRichJson.getGravity().length()>0){
-////					 if("center".equals(mMyRichJson.getGravity())){
-////						 ((TextView)getRealView()).setGravity(Gravity.CENTER);
-////					 }else  if("left".equals(mMyRichJson.getGravity())){
-////						 ((TextView)getRealView()).setGravity(Gravity.LEFT);
-////					 }else  if("right".equals(mMyRichJson.getGravity())){
-////						 ((TextView)getRealView()).setGravity(Gravity.RIGHT);
-////					 }
-////				}else{
-////					((TextView)getRealView()).setGravity(Gravity.LEFT);
-////				}
-//				 
-//  	    }else{
-//  	    	 
-//  	    }
-//  	   
-//	} catch (Exception e) {
-//		 
-//	}
-//  
-////  ((TextView)getRealView()).setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-//}
-//
-//class MyRichJson{
-//	  List<MyRich> myrichvalue;
-//	  String content;
-//	  String gravity;//left,
-//
-//	public List<MyRich> getMyrichvalue() {
-//		return myrichvalue;
-//	}
-//	public void setMyrichvalue(List<MyRich> myrichvalue) {
-//		this.myrichvalue = myrichvalue;
-//	}
-//	public String getContent() {
-//		return content;
-//	}
-//	public void setContent(String content) {
-//		this.content = content;
-//	}
-//	public String getGravity() {
-//		return gravity;
-//	}
-//	public void setGravity(String gravity) {
-//		this.gravity = gravity;
-//	}
-//	  
-//}
-//
-// class MyRich{
-//	  int onClickType;//0,
-//	  String strText;//从惺惺惜惺惺",
-//	  String strTextColor;//#000000",
-//	  int strTextSize;//:22
-//	 
-//	  
-//	public int getOnClickType() {
-//		return onClickType;
-//	}
-//	public void setOnClickType(int onClickType) {
-//		this.onClickType = onClickType;
-//	}
-//	public String getStrText() {
-//		return strText;
-//	}
-//	public void setStrText(String strText) {
-//		this.strText = strText;
-//	}
-//	public String getStrTextColor() {
-//		return strTextColor;
-//	}
-//	public void setStrTextColor(String strTextColor) {
-//		this.strTextColor = strTextColor;
-//	}
-//	public int getStrTextSize() {
-//		return strTextSize;
-//	}
-//	public void setStrTextSize(int strTextSize) {
-//		this.strTextSize = strTextSize;
-//	}
-//
-//	  
-//	  
-// }
+ 
 }

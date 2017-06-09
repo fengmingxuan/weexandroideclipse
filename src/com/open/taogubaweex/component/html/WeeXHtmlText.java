@@ -202,146 +202,169 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.open.taogubaweex.utils;
+package com.open.taogubaweex.component.html;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Point;
-import android.os.Build;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.TypedValue;
+import android.support.annotation.NonNull;
+import android.text.Html;
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.URLSpan;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-public class ScreenUtil {
-    private static final String TAG = "WXTBUtil";
+import com.alibaba.fastjson.JSONArray;
+import com.open.taogubaweex.widget.LinkClickableSpan;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.annotation.Component;
+import com.taobao.weex.common.Constants;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.ui.ComponentCreator;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXComponentProp;
+import com.taobao.weex.ui.component.WXText;
+import com.taobao.weex.ui.component.WXVContainer;
 
-    private static boolean isSupportSmartBar = false;
+/**
+ * Text component
+ */
+@Component(lazyload = false)
+public class WeeXHtmlText extends WXComponent<WeeXHtmlTextView> {
 
-    static {
-        isSupportSmartBar = isSupportSmartBar();
-    }
-    public static int getDisplayWidth(AppCompatActivity activity){
-        int width=0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            width = point.x;
-        }
-        return width;
-    }
+	/**
+	 * The default text size
+	 **/
+	public static final int sDEFAULT_SIZE = 32;
 
-    public static int getDisplayHeight(AppCompatActivity activity) {
-        int height = 0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            height=point.y;
-        }
+	public static class Creator implements ComponentCreator {
 
-        Log.e(TAG, "isSupportSmartBar:" + isSupportSmartBar);
-
-        if (isSupportSmartBar) {
-            int smartBarHeight = getSmartBarHeight(activity);
-            Log.e(TAG, "smartBarHeight:" + smartBarHeight);
-            height -= smartBarHeight;
-        }
-
-        if (activity != null && activity.getSupportActionBar() != null) {
-          int actionbar= activity.getSupportActionBar().getHeight();
-          if(actionbar==0){
-            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
-            actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
-          }
-          Log.d(TAG, "actionbar:" + actionbar);
-          height -= actionbar;
-        }
-
-        int status = getStatusBarHeight(activity);
-        Log.d(TAG, "status:" + status);
-
-        height -= status;
-
-        Log.d(TAG,"height:"+height);
-        return height;
-    }
-
-    private static int getStatusBarHeight(AppCompatActivity activity) {
-        Class<?> c;
-        Object obj;
-        Field field;
-        int x;
-        int statusBarHeight = 0;
-        try {
-            c = Class.forName("com.android.internal.R$dimen");
-            obj = c.newInstance();
-            field = c.getField("status_bar_height");
-            x = Integer.parseInt(field.get(obj).toString());
-            statusBarHeight = activity.getResources().getDimensionPixelSize(x);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return statusBarHeight;
-    }
-
-    private static int getSmartBarHeight(AppCompatActivity activity) {
-        ActionBar actionbar = activity.getSupportActionBar();
-        if (actionbar != null)
-            try {
-                Class c = Class.forName("com.android.internal.R$dimen");
-                Object obj = c.newInstance();
-                Field field = c.getField("mz_action_button_min_height");
-                int height = Integer.parseInt(field.get(obj).toString());
-                return activity.getResources().getDimensionPixelSize(height);
-            } catch (Exception e) {
-                e.printStackTrace();
-                actionbar.getHeight();
-            }
-        return 0;
-    }
-
-    private static boolean isSupportSmartBar() {
-        boolean hasSmartBar = false;
-        try {
-            final Method method = Build.class.getMethod("hasSmartBar");
-            if (method != null) {
-                hasSmartBar = true;
-            }
-        } catch (final Exception e) {
-            // return false;
-        }
-        return hasSmartBar;
-    }
-    
-    public static float dpToPx(Context context, float dp) {
-		if (context == null) {
-			return -1;
+		public WXComponent createInstance(WXSDKInstance instance, WXDomObject node, WXVContainer parent) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+			return new WeeXHtmlText(instance, node, parent);
 		}
-		return dp * context.getResources().getDisplayMetrics().density;
 	}
 
-	public static float pxToDp(Context context, float px) {
-		if (context == null) {
-			return -1;
+	@Deprecated
+	public WeeXHtmlText(WXSDKInstance instance, WXDomObject dom, WXVContainer parent, String instanceId, boolean isLazy) {
+		this(instance, dom, parent);
+	}
+
+	public WeeXHtmlText(WXSDKInstance instance, WXDomObject node, WXVContainer parent) {
+		super(instance, node, parent);
+	}
+
+	@Override
+	protected WeeXHtmlTextView initComponentHostView(@NonNull Context context) {
+		WeeXHtmlTextView textView = new WeeXHtmlTextView(context);
+		textView.holdComponent(this);
+		return textView;
+	}
+
+	@Override
+	public void updateExtra(Object extra) {
+		if (extra instanceof Layout && getHostView() != null && !extra.equals(getHostView().getTextLayout())) {
+			final Layout layout = (Layout) extra;
+			getHostView().setTextLayout(layout);
+			getHostView().invalidate();
 		}
-		return px / context.getResources().getDisplayMetrics().density;
 	}
 
-	public static float dpToPxInt(Context context, float dp) {
-		return (int) (dpToPx(context, dp) + 0.5f);
-	}
-
-	public static float pxToDpCeilInt(Context context, float px) {
-		return (int) (pxToDp(context, px) + 0.5f);
-	}
-
-	public static float getIntToDip(Context context, float dp) {
-		if (context == null) {
-			return 0.00f;
+	@Override
+	public void refreshData(WXComponent component) {
+		super.refreshData(component);
+		if (component instanceof WeeXHtmlText) {
+			updateExtra(component.getDomObject().getExtra());
 		}
-		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
 	}
+
+	@Override
+	protected boolean setProperty(String key, Object param) {
+		switch (key) {
+		case Constants.Name.LINES:
+		case Constants.Name.FONT_SIZE:
+		case Constants.Name.FONT_WEIGHT:
+		case Constants.Name.FONT_STYLE:
+		case Constants.Name.COLOR:
+		case Constants.Name.TEXT_DECORATION:
+		case Constants.Name.FONT_FAMILY:
+		case Constants.Name.TEXT_ALIGN:
+		case Constants.Name.TEXT_OVERFLOW:
+		case Constants.Name.LINE_HEIGHT:
+			return true;
+		default:
+			return super.setProperty(key, param);
+		}
+	}
+
+	public static void onClick(View widget, String instanceId, List<Object> params, String moduleName, String methodName) {
+		JSONArray array = new JSONArray();
+		for (Object obj : params) {
+			array.add(obj);
+		}
+		WXSDKManager.getInstance().getWXBridgeManager().callModuleMethod(instanceId, moduleName, methodName, array);
+	}
+
+	@WXComponentProp(name = "value")
+	public void setText(String value) {
+		try {
+//	    	WeexURLImageGetter imgGetter = new WeexURLImageGetter(getContext(), view);// 实例化URLImageGetter类
+//	    	Spanned spanned = Html.fromHtml(value,imgGetter,new UrlTagHandler(getContext()));
+			Spanned spanned = Html.fromHtml(value);
+			((TextView) getRealView()).setText(spanned);
+			((TextView) getRealView()).setMovementMethod(LinkMovementMethod.getInstance());  
+		    
+			URLSpan[] obj = spanned.getSpans(0, spanned.length(), URLSpan.class);
+			for (int i = 0; i < obj.length; i++) {
+				int start = spanned.getSpanStart(obj[i]);
+	            int end = spanned.getSpanEnd(obj[i]);
+				((Spannable) spanned).removeSpan(obj[i]);
+				LinkClickableSpan clickableSpan = new LinkClickableSpan(getContext(),obj[i].getURL());   
+				((Spannable) spanned).setSpan(clickableSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			}
+			((TextView) getRealView()).setText(spanned);
+		     
+		} catch (Exception e) {
+			e.printStackTrace();
+			((TextView) getRealView()).setText(value);
+		}
+	}
+
+	/**
+	 * Flush view no matter what height and width the {@link WXDomObject} specifies.
+	 * @param extra must be a {@link Layout} object, otherwise, nothing will happen.
+	 */
+	private void flushView(Object extra) {
+		if (extra instanceof Layout && getHostView() != null && !extra.equals(getHostView().getTextLayout())) {
+			final Layout layout = (Layout) extra;
+			/**The following if block change the height of the width of the textView.
+			 * other part of the code is the same to updateExtra
+			 */
+			ViewGroup.LayoutParams layoutParams = getHostView().getLayoutParams();
+			if (layoutParams != null) {
+				layoutParams.height = layout.getHeight();
+				layoutParams.width = layout.getWidth();
+				getHostView().setLayoutParams(layoutParams);
+			}
+			getHostView().setTextLayout(layout);
+			getHostView().invalidate();
+		}
+	}
+
+	@Override
+	protected Object convertEmptyProperty(String propName, Object originalValue) {
+		switch (propName) {
+		case Constants.Name.FONT_SIZE:
+			return WXText.sDEFAULT_SIZE;
+		case Constants.Name.COLOR:
+			return "black";
+		}
+		return super.convertEmptyProperty(propName, originalValue);
+	}
+
 }

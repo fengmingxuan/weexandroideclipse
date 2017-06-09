@@ -202,146 +202,87 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.open.taogubaweex.utils;
+package com.open.taogubaweex.component.html;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.ref.WeakReference;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Point;
-import android.os.Build;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.TypedValue;
+import android.graphics.Canvas;
+import android.text.Layout;
+import android.view.MotionEvent;
+import android.widget.TextView;
 
-public class ScreenUtil {
-    private static final String TAG = "WXTBUtil";
+import com.taobao.weex.ui.view.IRenderStatus;
+import com.taobao.weex.ui.view.gesture.WXGesture;
+import com.taobao.weex.ui.view.gesture.WXGestureObservable;
 
-    private static boolean isSupportSmartBar = false;
+/**
+ * TextView wrapper
+ */
+public class WeeXHtmlTextView extends TextView implements WXGestureObservable, IWeeXHtmlTextView, IRenderStatus<WeeXHtmlText> {
 
-    static {
-        isSupportSmartBar = isSupportSmartBar();
-    }
-    public static int getDisplayWidth(AppCompatActivity activity){
-        int width=0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            width = point.x;
-        }
-        return width;
-    }
+	private WeakReference<WeeXHtmlText> mWeakReference;
+	private WXGesture wxGesture;
+	private Layout textLayout;
 
-    public static int getDisplayHeight(AppCompatActivity activity) {
-        int height = 0;
-        if (activity != null && activity.getWindowManager() != null && activity.getWindowManager().getDefaultDisplay() != null) {
-            Point point=new Point();
-            activity.getWindowManager().getDefaultDisplay().getSize(point);
-            height=point.y;
-        }
+	public WeeXHtmlTextView(Context context) {
+		super(context);
+	}
 
-        Log.e(TAG, "isSupportSmartBar:" + isSupportSmartBar);
-
-        if (isSupportSmartBar) {
-            int smartBarHeight = getSmartBarHeight(activity);
-            Log.e(TAG, "smartBarHeight:" + smartBarHeight);
-            height -= smartBarHeight;
-        }
-
-        if (activity != null && activity.getSupportActionBar() != null) {
-          int actionbar= activity.getSupportActionBar().getHeight();
-          if(actionbar==0){
-            TypedArray actionbarSizeTypedArray=activity.obtainStyledAttributes(new int[]{android.R.attr.actionBarSize});
-            actionbar= (int) actionbarSizeTypedArray.getDimension(0,0);
-          }
-          Log.d(TAG, "actionbar:" + actionbar);
-          height -= actionbar;
-        }
-
-        int status = getStatusBarHeight(activity);
-        Log.d(TAG, "status:" + status);
-
-        height -= status;
-
-        Log.d(TAG,"height:"+height);
-        return height;
-    }
-
-    private static int getStatusBarHeight(AppCompatActivity activity) {
-        Class<?> c;
-        Object obj;
-        Field field;
-        int x;
-        int statusBarHeight = 0;
-        try {
-            c = Class.forName("com.android.internal.R$dimen");
-            obj = c.newInstance();
-            field = c.getField("status_bar_height");
-            x = Integer.parseInt(field.get(obj).toString());
-            statusBarHeight = activity.getResources().getDimensionPixelSize(x);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return statusBarHeight;
-    }
-
-    private static int getSmartBarHeight(AppCompatActivity activity) {
-        ActionBar actionbar = activity.getSupportActionBar();
-        if (actionbar != null)
-            try {
-                Class c = Class.forName("com.android.internal.R$dimen");
-                Object obj = c.newInstance();
-                Field field = c.getField("mz_action_button_min_height");
-                int height = Integer.parseInt(field.get(obj).toString());
-                return activity.getResources().getDimensionPixelSize(height);
-            } catch (Exception e) {
-                e.printStackTrace();
-                actionbar.getHeight();
-            }
-        return 0;
-    }
-
-    private static boolean isSupportSmartBar() {
-        boolean hasSmartBar = false;
-        try {
-            final Method method = Build.class.getMethod("hasSmartBar");
-            if (method != null) {
-                hasSmartBar = true;
-            }
-        } catch (final Exception e) {
-            // return false;
-        }
-        return hasSmartBar;
-    }
-    
-    public static float dpToPx(Context context, float dp) {
-		if (context == null) {
-			return -1;
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+		canvas.save();
+		Layout layout = getTextLayout();
+		if (layout != null) {
+			canvas.translate(getPaddingLeft(), getPaddingTop());
+			// texview重在layout上面。layout算宽高
+			// layout.draw(canvas);
 		}
-		return dp * context.getResources().getDisplayMetrics().density;
+		canvas.restore();
 	}
 
-	public static float pxToDp(Context context, float px) {
-		if (context == null) {
-			return -1;
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if (event.getAction() == MotionEvent.ACTION_MOVE || event.getAction() == MotionEvent.ACTION_SCROLL || event.getAction() == MotionEvent.ACTION_HOVER_MOVE) {
+			return true;
 		}
-		return px / context.getResources().getDisplayMetrics().density;
+		boolean result = super.onTouchEvent(event);
+		// if (wxGesture != null) {
+		// result |= wxGesture.onTouch(this, event);
+		// }
+		return result;
 	}
 
-	public static float dpToPxInt(Context context, float dp) {
-		return (int) (dpToPx(context, dp) + 0.5f);
+	@Override
+	public void registerGestureListener(WXGesture wxGesture) {
+		// this.wxGesture = wxGesture;
 	}
 
-	public static float pxToDpCeilInt(Context context, float px) {
-		return (int) (pxToDp(context, px) + 0.5f);
+	@Override
+	public CharSequence getText() {
+		return textLayout != null ? textLayout.getText() : "";
 	}
 
-	public static float getIntToDip(Context context, float dp) {
-		if (context == null) {
-			return 0.00f;
+	public Layout getTextLayout() {
+		return textLayout;
+	}
+
+	public void setTextLayout(Layout layout) {
+		this.textLayout = layout;
+		if (layout != null) {
+			setContentDescription(layout.getText());
 		}
-		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+		if (mWeakReference != null) {
+			WeeXHtmlText wxText = mWeakReference.get();
+			if (wxText != null) {
+				wxText.readyToRender();
+			}
+		}
+	}
+
+	@Override
+	public void holdComponent(WeeXHtmlText component) {
+		mWeakReference = new WeakReference<>(component);
 	}
 }
